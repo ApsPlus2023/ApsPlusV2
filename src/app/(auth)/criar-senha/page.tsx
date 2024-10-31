@@ -2,6 +2,9 @@ import CriarSenha from "@/components/auth/CriarSenha";
 import { Logo } from "@/components/ui/logo";
 import "bootstrap-icons/font/bootstrap-icons.css"; 
 
+export const dynamic = "force-dynamic";
+
+
 export default function Page() {
   return (
     <div className="flex max-w-[1500px] h-screen bg-white">
