@@ -1,46 +1,36 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+// Interface para descrever o relacionamento entre Patient e User
 interface PatientWithUser {
   id: string;
+  fullName: string;
+  city: string;
+  zipCode: string;
+  address: string;
+  district: string;
+  state: string;
   user: {
     phone: string | null;
   };
-  fullName: string;
-  socialName?: string;
-  rg?: string;
-  birthDate: Date;
-  gender: string;
-  selfDeclaredColor?: string;
-  maritalStatus?: string;
-  profession?: string;
-  zipCode: string;
-  address: string;
-  addressNumber: string;
-  district: string;
-  city: string;
-  state: string;
-  insuranceNumber?: string;
-  insuranceRelation?: string;
-  insurancePlan?: string;
 }
 
 export async function GET() {
   try {
     const patients = await prisma.patient.findMany({
       include: {
-        user: true, 
+        user: true, // Inclui os dados do usuário relacionado
       },
     });
 
-    const formattedPatients = patients.map((patient: PatientWithUser, index: number) => ({
+    // Mapeamento para formatar os dados
+    const formattedPatients = patients.map((patient, index) => ({
       id: patient.id,
       nomeCompleto: patient.fullName,
       codigo: `#PC${String(index + 1).padStart(3, '0')}`,
       cidade: patient.city,
-      status: "Ativo",
-      telefone: patient.user.phone || "",
+      status: "Ativo", // Exemplo de status estático, ajuste conforme necessário
+      telefone: patient.user?.phone || "", // Usa o telefone do usuário, se disponível
       cep: patient.zipCode,
       endereco: patient.address,
       bairro: patient.district,

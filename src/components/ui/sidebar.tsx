@@ -62,8 +62,15 @@ export default function Sidebar() {
   );
 }
 
+// Definindo os tipos das props do SidebarContent
+interface SidebarContentProps {
+  handleLinkClick: (path: string) => void;
+  pathname: string;
+  handleLogout: () => void;
+}
+
 // Componente separado para o conteúdo da Sidebar
-function SidebarContent({ handleLinkClick, pathname, handleLogout }) {
+function SidebarContent({ handleLinkClick, pathname, handleLogout }: SidebarContentProps) {
   return (
     <div className="mx-4 flex-grow">
       <div className="flex flex-col p-4 space-y-7 font-semibold text-md">

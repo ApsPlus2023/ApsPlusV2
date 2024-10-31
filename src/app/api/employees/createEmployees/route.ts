@@ -1,40 +1,61 @@
-// src/app/api/employees/createEmployees/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import { Role, Profession } from "@prisma/client"; // Importa os enums Role e Profession
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com', // Especifique o host correto
-  port: 587,                  // Porta 587 para TLS (STARTTLS)
-  secure: false,              // `secure` deve ser `false` para TLS na porta 587
+  host: 'smtp.hostinger.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  debug: true,    // Habilita o modo de depuração
-  logger: true,   // Habilita o log completo
+  debug: true,
+  logger: true,
 });
 
 export async function POST(request: Request) {
   try {
-    const { nome, cpf, telefone, email, profissao, cep, endereco, numero, complemento, bairro, cidade, estado } = await request.json();
+    const {
+      nome,
+      cpf,
+      telefone,
+      email,
+      profissao,
+      cep,
+      endereco,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+    } = await request.json();
 
-    // Validação das variáveis de ambiente
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       throw new Error("Variáveis de ambiente para o email não estão configuradas.");
     }
 
-    // Mapeamento de profissões em português para valores esperados pelo Prisma
-    const professionMap: Record<string, string> = {
-      Administrador: "ADMIN",
-      Médico: "DOCTOR",
-      Enfermeiro: "NURSE",
-      Atendente: "ATTENDANT",
-      Paciente: "PATIENT",
+    // Mapeamento de profissões para valores esperados pelo Prisma
+    const roleMap: Record<string, Role> = {
+      Administrador: Role.ADMIN,
+      Médico: Role.DOCTOR,
+      Enfermeiro: Role.NURSE,
+      Atendente: Role.ATTENDANT,
+      Paciente: Role.PATIENT,
     };
 
-    const role = professionMap[profissao];
-    if (!role) {
+    const professionMap: Record<string, Profession> = {
+      Administrador: Profession.ADMIN,
+      Médico: Profession.DOCTOR,
+      Enfermeiro: Profession.NURSE,
+      Atendente: Profession.ATTENDANT,
+    };
+
+    const role = roleMap[profissao];
+    const profession = professionMap[profissao];
+
+    if (!role || !profession) {
       return NextResponse.json({ error: `Profissão inválida: ${profissao}` }, { status: 400 });
     }
 
@@ -54,7 +75,7 @@ export async function POST(request: Request) {
         cpf,
         name: nome,
         phone: telefone,
-        role,  // Usa o valor mapeado
+        role, // Usa o valor mapeado como Role
       },
     });
 
@@ -64,7 +85,7 @@ export async function POST(request: Request) {
         userId: user.id,
         fullName: nome,
         phone: telefone,
-        profession: role,
+        profession, // Usa o valor mapeado como Profession
         zipCode: cep,
         address: endereco,
         addressNumber: numero,
@@ -95,7 +116,7 @@ export async function POST(request: Request) {
       console.error("Erro ao enviar e-mail:", emailError);
       return NextResponse.json({
         message: "Funcionário cadastrado com sucesso, mas o e-mail não pôde ser enviado.",
-        employee
+        employee,
       }, { status: 201 });
     }
 
@@ -103,7 +124,6 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Erro ao criar funcionário:", error);
 
-    // Log específico para erros do Nodemailer
     if (error.response) {
       console.error("Erro específico do Nodemailer:", error.response);
     }
