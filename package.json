@@ -6,11 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "prisma migrate deploy && next start",
-    "seed": "ts-node --transpile-only ./prisma/seed.ts",
     "lint": "next lint"
-  },
-  "prisma": {
-    "seed": "ts-node --transpile-only ./prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
