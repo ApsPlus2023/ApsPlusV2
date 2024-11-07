@@ -8,17 +8,19 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String?
-  name        String
-  phone       String?
-  cpf         String   @unique
-  role        Role     @default(PATIENT)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  patient     Patient?
-  employee    Employee?
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String?
+  name         String
+  phone        String?
+  cpf          String        @unique
+  role         Role          @default(PATIENT)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  patient      Patient?
+  employee     Employee?
+  conversations Conversation[] @relation("ParticipantConversations")
+  messages      Message[]      @relation("UserMessages")
 }
 
 model Patient {
@@ -57,6 +59,24 @@ model Employee {
   district      String
   city          String
   state         String
+}
+
+model Conversation {
+  id           String     @id @default(uuid())
+  participants User[]     @relation("ParticipantConversations")
+  messages     Message[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Message {
+  id            String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  text           String
+  createdAt      DateTime     @default(now())
 }
 
 enum Role {

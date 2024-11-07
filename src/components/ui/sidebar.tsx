@@ -141,9 +141,9 @@ function SidebarContent({ handleLinkClick, pathname, handleLogout }: SidebarCont
       <div className="p-3">
         <div className="flex gap-2 items-center mb-7">
           <span 
-            onClick={() => handleLinkClick("/conversas")}
+            onClick={() => handleLinkClick("/funcionario/conversas")}
             className={`text-gray-500 font-semibold text-sm cursor-pointer ${
-              pathname === "/conversas" ? "text-azulAps" : ""
+              pathname === "/funcionario/conversas" ? "text-azulAps" : ""
             }`}
           >
             CONVERSAS
